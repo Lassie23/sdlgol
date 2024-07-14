@@ -13,6 +13,8 @@ int birth[] = {3, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int b_size = 1;
 int invert = 1;
 int cell_size = 10;
+unsigned char *board;
+unsigned char *counts;
 SDL_Window *win;
 SDL_Renderer *ren;
 
@@ -25,7 +27,7 @@ void delay(int milli_seconds) {
     }
 }
 
-void draw(int board[bx * by]) {
+void draw(unsigned char board[bx * by]) {
     SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
     SDL_RenderClear(ren);
     SDL_Rect rect;
@@ -44,7 +46,7 @@ void draw(int board[bx * by]) {
     SDL_RenderPresent(ren);
 }
 
-int count_live_neighbours(int board[bx * by], int x, int y) {
+int count_live_neighbours(unsigned char board[bx * by], int x, int y) {
     return \
            board[((y+by - 1) % by) * bx + ((x+bx - 1) % bx)] \
          + board[((y+by - 1) % by) * bx +   x              ] \
@@ -83,7 +85,12 @@ int main(int argc, char *argv[]) {
         switch (c) {
             case 'x':
                 if (isNumber(optarg)) {
-                    bx = atoi(optarg);
+                    if (atoi(optarg) != 0) {
+                        bx = atoi(optarg);
+                    } else {
+                        fprintf (stderr, "Option -%c cannot be zero.\n", optopt);
+                        return 1;
+                    }
                 } else {
                     fprintf (stderr, "Option -%c must be a number.\n", optopt);
                     return 1;
@@ -91,7 +98,12 @@ int main(int argc, char *argv[]) {
                 break;
             case 'y':
                 if (isNumber(optarg)) {
-                    by = atoi(optarg);
+                    if (atoi(optarg) != 0) {
+                        by = atoi(optarg);
+                    } else {
+                        fprintf (stderr, "Option -%c cannot be zero.\n", optopt);
+                        return 1;
+                    }
                 } else {
                     fprintf (stderr, "Option -%c must be a number.\n", optopt);
                     return 1;
@@ -152,13 +164,13 @@ int main(int argc, char *argv[]) {
         }
     }
     srand(time(0));
-    int board[bx * by];
+    board = (unsigned char *)malloc(sizeof(unsigned char) * bx * by);
     for (int x = 0; x < bx; x++) {
         for (int y = 0; y < by; y++) {
             board[y * bx + x] = rand() % 3 % 2;
         }
     }
-    int counts[bx * by];
+    counts = (unsigned char *)malloc(sizeof(unsigned char) * bx * by);
     SDL_Init(SDL_INIT_VIDEO);
     win = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, bx*cell_size, by*cell_size, SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
