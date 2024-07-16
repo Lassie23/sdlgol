@@ -18,15 +18,6 @@ unsigned char *counts;
 SDL_Window *win;
 SDL_Renderer *ren;
 
-void delay(int milli_seconds) {
-    // Storing start time
-    clock_t start_time = clock();
-
-    // looping till required time is not achieved
-    while (clock() < start_time + milli_seconds * 1000) { ;
-    }
-}
-
 void draw(unsigned char board[bx * by]) {
     SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
     SDL_RenderClear(ren);
@@ -175,7 +166,7 @@ int main(int argc, char *argv[]) {
     win = SDL_CreateWindow("Game of Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, bx*cell_size, by*cell_size, SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     draw(board);
-    delay(delay_time);
+    SDL_Delay(delay_time);
     int running = 1;
     int once = 0;
     int quit = 0;
@@ -207,7 +198,7 @@ int main(int argc, char *argv[]) {
                 running = 0;
                 once = 0;
             } else {
-                delay(delay_time);
+                SDL_Delay(delay_time);
             }
         }
         while (SDL_PollEvent(&e)) {
