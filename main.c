@@ -13,6 +13,8 @@ int birth[] = {3, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int b_size = 1;
 int invert = 1;
 int cell_size = 10;
+int radius = 1;
+int von_Neumann = 0;
 unsigned char *board;
 unsigned char *counts;
 SDL_Window *win;
@@ -38,20 +40,20 @@ void draw(unsigned char board[bx * by]) {
 }
 
 int count_live_neighbours(unsigned char board[bx * by], int x, int y) {
-    return \
-           board[((y+by - 1) % by) * bx + ((x+bx - 1) % bx)] \
-         + board[((y+by - 1) % by) * bx +   x              ] \
-         + board[((y+by - 1) % by) * bx + ((x+bx + 1) % bx)] \
-         + board[  y               * bx + ((x+bx - 1) % bx)] \
-         + board[  y               * bx + ((x+bx + 1) % bx)] \
-         + board[((y+by + 1) % by) * bx + ((x+bx - 1) % bx)] \
-         + board[((y+by + 1) % by) * bx +   x              ] \
-         + board[((y+by + 1) % by) * bx + ((x+bx + 1) % bx)];
+    int count = 0;
+    for (int h = -radius; h <= radius; h++) {
+        for (int v = -radius; v <= radius; v++) {
+            if (board[(y+v+by) % by * bx + (x+h+bx) % bx] && (h != 0 || v != 0) && (!von_Neumann || abs(h) + abs(v) <= radius)) {
+                count++;
+            }
+        }
+    }
+    return count;
 }
 
 int isNumber(char *s) {
     int is = 1;
-    int z = 0;
+    unsigned char z = 0;
     while (z<strlen(s) && is == 1) {
         if (s[z] < "0"[0] || s[z] > "9"[0]) {
             is = 0;
@@ -62,7 +64,7 @@ int isNumber(char *s) {
 }
 
 int isinarray(int val, int *arr, size_t size) {
-    for (int i = 0; i < size; i++) {
+    for (unsigned char i = 0; i < size; i++) {
         if (arr[i] == val) {
             return 1;
         }
@@ -72,7 +74,7 @@ int isinarray(int val, int *arr, size_t size) {
 
 int main(int argc, char *argv[]) {
     int c;
-    while ((c = getopt(argc, argv, "x:y:d:s:b:r:i")) != -1) {
+    while ((c = getopt(argc, argv, "x:y:d:s:b:r:R:vi")) != -1) {
         switch (c) {
             case 'x':
                 if (isNumber(optarg)) {
@@ -141,6 +143,17 @@ int main(int argc, char *argv[]) {
                     return 1;
                 }
                 break;
+            case 'R':
+                if (isNumber(optarg)) {
+                    radius = atoi(optarg);
+                } else {
+                    fprintf (stderr, "Option -%c must be a number.\n", optopt);
+                    return 1;
+                }
+            break;
+            case 'v':
+                von_Neumann = 1;
+            break;
             case '?':
                 if (optopt == 'x' || optopt == 'y' || optopt == 'd') {
                     fprintf (stderr, "Option -%c requires an argument.\n", optopt);
