@@ -256,6 +256,7 @@ int main(int argc, char *argv[]) {
                             once = 1;
                             break;
                     }
+                    break;
                 case SDL_MOUSEBUTTONDOWN:
                     if (e.button.button == 1) {
                         if (e.button.x/cell_size < bx && e.button.y/cell_size < by) {
@@ -270,4 +271,5 @@ int main(int argc, char *argv[]) {
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
+    return 0;
 }
